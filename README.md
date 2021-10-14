@@ -9,7 +9,7 @@ Known Bugs:
 
 To use this viewer, type:
 
-    % pip3 install tlgui
+    % pip3 install tl-pyview
     
 Then, run the program with the command
 
