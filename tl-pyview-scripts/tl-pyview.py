@@ -272,4 +272,5 @@ def main():
     ani = matplotlib.animation.FuncAnimation(plotter.fig, plotter.animate, interval=100)#dev.data.rate())
     app.mainloop()
 
-main()
+if __name__ == "__main__":
+  main()
