@@ -14,7 +14,7 @@ import argparse
 import tkinter as tk
 from tkinter import ttk
 
-import tl_plotter as rtp
+import tl_plot.tl_plotter as rtp
 
 # styles and fonts
 matplotlib.use("TkAgg")
