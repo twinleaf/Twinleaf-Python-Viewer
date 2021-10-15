@@ -14,7 +14,7 @@ import argparse
 import tkinter as tk
 from tkinter import ttk
 
-import realTimePlotter as rtp
+import tl_plotter as rtp
 
 # styles and fonts
 matplotlib.use("TkAgg")
