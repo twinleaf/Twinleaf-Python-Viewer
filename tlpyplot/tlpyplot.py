@@ -1,19 +1,23 @@
-# class to make general real time plot
+#!/usr/bin/env python3
+"""
+tlgraph: Class to create a matplotlib graph that updates live using data from a Twinleaf I/O data source, notably from any object that has a readAvailable() method. This can be a sensor.data object, or a sensor.stream object, or even a sensors.syncstream object. 
+License: MIT
+Author: Esme Rubinstein <rubinstein@twinleaf.com>, Tom Kornack <kornack@twinleaf.com>
+"""
 
 import tldevicesync
 import collections
 import matplotlib.pyplot
 import matplotlib.animation
 
-chartLoad = True
-
-class RealtimePlotG:
+class TLPyPlot:
     def __init__(self,
                  queueLength,
                  streamList,
                  connectionPort = 'tcp://localhost',
                  xlabel="Time (s)"):
 
+        self.pause = False
         self.connectionPort = connectionPort
         self.streamList = streamList
         self.queueLength = queueLength
@@ -64,7 +68,7 @@ class RealtimePlotG:
         for i in range(len(dataLoad)):
             if type(dataLoad[i]) is float:
                 dataLoad[i] = [self.ss.read(samples = 1)[i]]
-            if chartLoad:
+            if not self.pause:
                 if i == 0:
                     self.data_t.extend(dataLoad[i])
                 else:

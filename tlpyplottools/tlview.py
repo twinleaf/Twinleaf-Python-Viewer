@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+"""
+tlview: Graphical data viewer
+License: MIT
+Author: Esme Rubinstein <rubinstein@twinleaf.com>, Tom Kornack <kornack@twinleaf.com>
+"""
+
 import matplotlib
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -14,7 +21,7 @@ import argparse
 import tkinter as tk
 from tkinter import ttk
 
-import tl_plot.tl_plotter as rtp
+import tlpyplot
 
 # styles and fonts
 matplotlib.use("TkAgg")
@@ -30,7 +37,7 @@ def processCommandLineArgs():
                 default='tcp://localhost/',
                 help='URL: tcp://localhost')
     args = parser.parse_args()
-    tio = rtp.tldevicesync.DeviceSync(args.url)
+    tio = tlpyplot.tldevicesync.DeviceSync(args.url)
     time.sleep(1)
     return tio
 
@@ -64,10 +71,10 @@ def popupmsg(msg):
 
 # pause function
 def loadChart():
-    if rtp.chartLoad == True:
-        rtp.chartLoad = False
+    if rtp.pause == True:
+        rtp.pause = False
     else:
-        rtp.chartLoad = True
+        rtp.pause = True
 
 # set initial stream list by looking at connected devices
 def setDefaults(tio, vmrStreamList):
@@ -83,7 +90,7 @@ def setDefaults(tio, vmrStreamList):
     return defaultStream, start_stream, start_length
 
 def createPlot(streamList, windowLength):
-    plotter = rtp.RealtimePlotG(queueLength = windowLength, streamList = streamList)
+    plotter = tlpyplot.TLPyPlot(queueLength = windowLength, streamList = streamList)
     return plotter
 
 class graphInterface(tk.Tk):
