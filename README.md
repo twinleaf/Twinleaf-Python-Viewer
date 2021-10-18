@@ -8,13 +8,13 @@ Provides a Python graphical user interface to view sensor data. Currently works 
 
 Python > 3.6 *with Tk*. To install:
 
-    % brew install python-tk
+    % brew install python3-tk
 
 ## Setting Up the GUI
 
 To use this viewer, type:
 
-    % pip3 install tlview
+    % pip3 install tio-viewer
 
 Then, run the program as follows, depending on your platform:
 
