@@ -13,7 +13,7 @@ import tkinter
 import tlpyplot
 
 # styles and fonts
-# matplotlib.use("TkAgg")
+matplotlib.use("TkAgg")
 matplotlib.style.use("ggplot")
 
 def processCommandLineArgs():
@@ -50,9 +50,9 @@ def findConnectedDevices(tio):
 def popupmsg(msg):
     popup = tkinter.Tk()
     popup.wm_title("!")
-    label = tkinter.ttk.Label(popup, text = msg)
+    label = tkinter.Label(popup, text = msg)
     label.pack(side = 'top', fill = 'x', pady = 10)
-    B1 = tkinter.ttk.Button(popup, text = "Ok", command = popup.destroy)
+    B1 = tkinter.Button(popup, text = "Ok", command = popup.destroy)
     B1.pack()
     popup.mainloop()
 
@@ -152,7 +152,7 @@ class StartPage(tkinter.Frame):
 
         def getStreamEntry():
             subframe2 = tkinter.Frame(self)
-            e = tkinter.ttk.Entry(subframe2)
+            e = tkinter.Entry(subframe2)
             e.insert(0, defaultStream)
             e.pack(side = 'left')
             e.focus_set()
@@ -181,16 +181,16 @@ class StartPage(tkinter.Frame):
                 else:
                     popupmsg("Only one stream from each device can be added.")  
 
-            b = tkinter.ttk.Button(subframe2, text = "Load Streams", width = 10, command = callback)
+            b = tkinter.Button(subframe2, text = "Load Streams", width = 10, command = callback)
             b.pack(side = 'left')
             subframe2.pack()
 
         getStreamEntry()
 
-        button = tkinter.ttk.Button(self, text="Go!",
+        button = tkinter.Button(self, text="Go!",
                             command=lambda: controller.show_frame(GraphPage))
         button.pack()
-        quitbutton = tkinter.ttk.Button(self, text = "Quit", command = quit)
+        quitbutton = tkinter.Button(self, text = "Quit", command = quit)
         quitbutton.pack()
 
 class GraphPage(tkinter.Frame):
@@ -204,10 +204,10 @@ class GraphPage(tkinter.Frame):
             # label = tkinter.Label(subsubframe, text = "TIO Monitor")
             # label.grid(column = 0, row = 0, padx = 30)
 
-            label2 = tkinter.ttk.Label(subsubframe, text = "Window Duration (s)")
+            label2 = tkinter.Label(subsubframe, text = "Window Duration (s)")
             label2.grid(column = 1, row = 0)
 
-            e = tkinter.ttk.Entry(subsubframe)
+            e = tkinter.Entry(subsubframe)
             e.insert(0, windowLength)
             e.grid(column = 2, row = 0)
             e.focus_set()
@@ -218,19 +218,19 @@ class GraphPage(tkinter.Frame):
                 plotter.increaseQueueSize(windowLength)
                 print("set window length to", windowLength)
 
-            b = tkinter.ttk.Button(subsubframe, text = "Submit", width = 5, command = callback)
+            b = tkinter.Button(subsubframe, text = "Submit", width = 5, command = callback)
             b.grid(column = 3, row = 0, padx = 20)
 
             subsubframe2 = tkinter.Frame(subframe)
 
-            # pauseb = tkinter.ttk.Button(subsubframe2, text = "Pause/Resume", command = lambda: loadChart())
+            # pauseb = tkinter.Button(subsubframe2, text = "Pause/Resume", command = lambda: loadChart())
             # pauseb.grid(column = 0, row = 0, padx = 20)
 
-            button1 = tkinter.ttk.Button(subsubframe2, text="Back to Home",
+            button1 = tkinter.Button(subsubframe2, text="Back to Home",
                             command=lambda: controller.show_frame(StartPage))
             button1.grid(column = 2, row = 0, padx = 20)
 
-            quitbutton = tkinter.ttk.Button(subsubframe2, text = "Quit", command = quit)
+            quitbutton = tkinter.Button(subsubframe2, text = "Quit", command = quit)
             quitbutton.grid(column = 3, row = 0, padx = 20)
 
             subsubframe.grid(row = 0, column = 0)
