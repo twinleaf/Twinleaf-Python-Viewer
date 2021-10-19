@@ -8,7 +8,7 @@ Provides a Python graphical user interface to view sensor data. Currently works 
 
 Python > 3.6 *with Tk*. To install:
 
-    % brew install python-tk # macOS
+    % brew install python3-tk # macOS
     % apt install python-tk # Linux
 
 on windows it should be installed by default.
