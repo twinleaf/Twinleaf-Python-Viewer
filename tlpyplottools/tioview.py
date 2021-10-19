@@ -34,17 +34,20 @@ def getStreams():
 
 # finds connected devices and returns dict of devices and columnnames for those devices
 def findConnectedDevices(tio):
+    deviceInstances = []
     devAttributes = {}
     for device in tio._routes:
         if device == '/':
             m = getattr(tio, tio._routes[device].dev.name().lower())
+            deviceInstances.append(m)
             name = tio._routes[device].dev.name().lower()
             devAttributes[name] = m.data.columnnames()
         else:
             m = getattr(tio,tio._routes[device].dev.name().lower()+str(device))
+            deviceInstances.append(m)
             name = tio._routes[device].dev.name().lower()+str(device)
             devAttributes[name] = m.data.columnnames()
-    return devAttributes
+    return (devAttributes, deviceInstances)
 
 # popup message general function
 def popupmsg(msg):
@@ -67,7 +70,7 @@ def popupmsg(msg):
 def setDefaults(tio, vmrStreamList):
     start_length = 500
     defaultStream = "Enter Streams Here"
-    connectedDevices = findConnectedDevices(tio)
+    connectedDevices = findConnectedDevices(tio)[0]
     for device in connectedDevices:
         if "sync" not in device:
             defaultStream = device.lower() + "." + vmrStreamList[0]
@@ -79,6 +82,7 @@ def setDefaults(tio, vmrStreamList):
 def createPlot(streamList, windowLength):
     plotter = tlpyplot.TLPyPlot(queueLength = windowLength, streamList = streamList)
     return plotter
+
 
 class graphInterface(tkinter.Tk):
     def __init__(self, tio, plotter, vmrStreamList, defaultStream, windowLength, *args, **kwargs):
@@ -133,7 +137,7 @@ class StartPage(tkinter.Frame):
             subframe = tkinter.Frame(self)
             labels = []
             streamb = []
-            deviceAttributes = findConnectedDevices(tio)
+            deviceAttributes = findConnectedDevices(tio)[0]
             i = 0
             n = 0           
             for device in deviceAttributes:
@@ -213,8 +217,13 @@ class GraphPage(tkinter.Frame):
             e.focus_set()
 
             def callback():
-                length = e.get()
-                windowLength = int(length)
+                seconds = e.get()
+                devices = findConnectedDevices(tio)[1]
+                if len(devices) > 1:
+                    rate = devices[1].data.rate()
+                else:
+                    rate = devices[0].data.rate()
+                windowLength = int(seconds)*int(rate)
                 plotter.increaseQueueSize(windowLength)
                 print("set window length to", windowLength)
 
