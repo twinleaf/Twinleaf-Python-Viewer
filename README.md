@@ -8,25 +8,36 @@ Provides a Python graphical user interface to view sensor data. Currently works 
 
 Python > 3.6 *with Tk*. To install:
 
-    % brew install python-tk
+    % brew install python-tk # macOS
+    % apt install python-tk # Linux
 
-## Setting Up the GUI
+on windows it should be installed by default.
 
-To use this viewer, type:
+## Installation
 
-    % pip3 install tlview
+Using pip (coming soon):
+
+    % pip3 install tioview
+
+Clone this repository and install using either:
+
+    % pip3 install .
+
+or
+
+    % python3 setup.py
 
 Then, run the program as follows, depending on your platform:
 
-    % tlview # default connection to proxy at tcp://localhost
-    % tlview /dev/cu.usbmodem123495 # macOS, USB CDC
-    % tlview /dev/cu.usbserial123456 # macOS, USB FTDI
-    % tlview /dev/ttyACM0 # Linux, USB CDC
-    % tlview /dev/ttyUSB0 # Linux, USB FTDI
-    % tlview /dev/ttyS3 # WSL
-    % tlview COM3 # Windows
-    % tlview udp://tio-sync8.local # macOS, linux
-    % tlview tcp://10.0.0.x # macOS, Linux, connection to proxy
+    % tioview # default connection to proxy at tcp://localhost
+    % tioview /dev/cu.usbmodem123495 # macOS, USB CDC
+    % tioview /dev/cu.usbserial123456 # macOS, USB FTDI
+    % tioview /dev/ttyACM0 # Linux, USB CDC
+    % tioview /dev/ttyUSB0 # Linux, USB FTDI
+    % tioview /dev/ttyS3 # WSL
+    % tioview COM3 # Windows
+    % tioview udp://tio-sync8.local # macOS, linux
+    % tioview tcp://10.0.0.x # macOS, Linux, connection to proxy
 
 Visit our [Getting Started](https://twinleaf.com/start/) page for more details on getting started with Twinleaf sensors.
 
