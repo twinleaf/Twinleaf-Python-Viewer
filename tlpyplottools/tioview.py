@@ -218,11 +218,7 @@ class GraphPage(tkinter.Frame):
 
             def callback():
                 seconds = e.get()
-                devices = findConnectedDevices(tio)[1]
-                if len(devices) > 1:
-                    rate = devices[1].data.rate()
-                else:
-                    rate = devices[0].data.rate()
+                rate = plotter.ss.rate()
                 windowLength = int(seconds)*int(rate)
                 plotter.increaseQueueSize(windowLength)
                 print("set window length to", windowLength)
