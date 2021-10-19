@@ -221,7 +221,7 @@ class GraphPage(tkinter.Frame):
                 rate = plotter.ss.rate()
                 windowLength = int(seconds)*int(rate)
                 plotter.increaseQueueSize(windowLength)
-                print("set window length to", windowLength)
+                #print("set window length to", windowLength)
 
             b = tkinter.Button(subsubframe, text = "Submit", width = 5, command = callback)
             b.grid(column = 3, row = 0, padx = 20)
