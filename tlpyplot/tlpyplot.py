@@ -53,7 +53,7 @@ class TLPyPlot:
             else:
                 matplotlib.pyplot.setp(self.allax[i-1].get_xticklabels(), visible = False)
 
-    def increaseQueueSize(self, size):
+    def changeQueueSize(self, size):
         newT = collections.deque(maxlen = size)
         newT.extend(self.data_t)
         self.data_t = newT
