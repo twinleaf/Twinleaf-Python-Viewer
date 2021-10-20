@@ -14,11 +14,9 @@ class TLPyPlot:
     def __init__(self,
                  queueLength,
                  streamList,
-                 connectionPort = 'tcp://localhost',
                  xlabel="Time (s)"):
 
         self.pause = False
-        self.connectionPort = connectionPort
         self.streamList = streamList
         self.queueLength = queueLength
         self.xlabel = xlabel
@@ -67,7 +65,7 @@ class TLPyPlot:
         dataLoad = self.ss.readAvailable()
         for i in range(len(dataLoad)):
             if type(dataLoad[i]) is float:
-                dataLoad[i] = [self.ss.read(samples = 1)[i]]
+                dataLoad[i] = [dataLoad[i]]#[self.ss.read(samples = 1)[i]]
             if not self.pause:
                 if i == 0:
                     self.data_t.extend(dataLoad[i])

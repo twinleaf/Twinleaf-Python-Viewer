@@ -17,8 +17,8 @@ matplotlib.use("TkAgg")
 matplotlib.style.use("ggplot")
 
 def processCommandLineArgs():
-    parser = argparse.ArgumentParser(prog='vectorMonitor', 
-                             description='Vector Field Graphing Monitor')
+    parser = argparse.ArgumentParser(prog='tioview', 
+                             description='Python Graphing Monitor')
     parser.add_argument("url", 
                 nargs='?', 
                 default='tcp://localhost/',
