@@ -38,12 +38,12 @@ def findConnectedDevices(tio):
     devAttributes = {}
     for device in tio._routes:
         if device == '/':
-            m = getattr(tio, tio._routes[device].dev.name().lower())
+            m = tio._routes[device]
             deviceInstances.append(m)
             name = tio._routes[device].dev.name().lower()
             devAttributes[name] = m.data.columnnames()
         else:
-            m = getattr(tio,tio._routes[device].dev.name().lower()+str(device))
+            m = tio._routes[device]
             deviceInstances.append(m)
             name = tio._routes[device].dev.name().lower()+str(device)
             devAttributes[name] = m.data.columnnames()
