@@ -28,26 +28,15 @@ def processCommandLineArgs():
     time.sleep(1)
     return tio
 
-def getStreams():
-    vmrStreamList = ["vector", "accel", "gyro", "bar", "therm"]
-    return vmrStreamList
-
-# finds connected devices and returns dict of devices and columnnames for those devices
-def findConnectedDevices(tio):
-    deviceInstances = []
-    devAttributes = {}
+def getStreams(tio):
+    deviceDict = {}
     for device in tio._routes:
-        if device == '/':
-            m = tio._routes[device]
-            deviceInstances.append(m)
-            name = tio._routes[device].dev.name().lower()
-            devAttributes[name] = m.data.columnnames()
-        else:
-            m = tio._routes[device]
-            deviceInstances.append(m)
-            name = tio._routes[device].dev.name().lower()+str(device)
-            devAttributes[name] = m.data.columnnames()
-    return (devAttributes, deviceInstances)
+        streams = []
+        pstreams = tio._routes[device]._tio.protocol.streams
+        for i in range(len(pstreams)):
+            streams.append(pstreams[i]['source_name'])
+        deviceDict[tio._routes[device]] = streams
+    return deviceDict
 
 # popup message general function
 def popupmsg(msg):
@@ -67,16 +56,20 @@ def popupmsg(msg):
 #         rtp.pause = True
 
 # set initial stream list by looking at connected devices
-def setDefaults(tio, vmrStreamList):
+def setDefaults(tio):
     start_length = 500
     defaultStream = "Enter Streams Here"
-    connectedDevices = findConnectedDevices(tio)[0]
-    for device in connectedDevices:
-        if "sync" not in device:
-            defaultStream = device.lower() + "." + vmrStreamList[0]
-            device = getattr(tio,device.lower())
-            stre = getattr(device, vmrStreamList[0])
+    connectedDevices = getStreams(tio)
+    for key in tio._routes:
+        device = tio._routes[key]
+        if "sync" not in device.dev.name().lower():
+            if key == '/':
+                defaultStream = device.dev.name().lower() + "." + connectedDevices[device][0]
+            else:
+                defaultStream = device.dev.name().lower() + key + "." + connectedDevices[device][0]
+            stre = getattr(device, connectedDevices[device][0])
             start_stream = [stre]
+            break 
     return defaultStream, start_stream, start_length
 
 def createPlot(streamList, windowLength):
@@ -85,7 +78,7 @@ def createPlot(streamList, windowLength):
 
 
 class graphInterface(tkinter.Tk):
-    def __init__(self, tio, plotter, vmrStreamList, defaultStream, windowLength, *args, **kwargs):
+    def __init__(self, tio, plotter, defaultStream, windowLength, *args, **kwargs):
         tkinter.Tk.__init__(self, *args, **kwargs)
         #tkinter.Tk.iconbitmap(self, default="clienticon.ico")
         tkinter.Tk.wm_title(self, "Twinleaf Monitor")
@@ -114,7 +107,7 @@ class graphInterface(tkinter.Tk):
 
         self.frames = {}
         for F in (StartPage, GraphPage):
-            frame = F(tio, plotter, vmrStreamList, defaultStream, windowLength, container, self)
+            frame = F(tio, plotter, defaultStream, windowLength, container, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
         self.show_frame(StartPage)
@@ -125,7 +118,7 @@ class graphInterface(tkinter.Tk):
 
 class StartPage(tkinter.Frame):
 
-    def __init__(self, tio,plotter, vmrStreamList, defaultStream, windowLength, parent, controller):
+    def __init__(self, tio,plotter, defaultStream, windowLength, parent, controller):
         tkinter.Frame.__init__(self,parent)
         label = tkinter.Label(self, text="Available Streams")
         label.pack()
@@ -137,16 +130,20 @@ class StartPage(tkinter.Frame):
             subframe = tkinter.Frame(self)
             labels = []
             streamb = []
-            deviceAttributes = findConnectedDevices(tio)[0]
+            deviceAttributes = getStreams(tio)
             i = 0
             n = 0           
-            for device in deviceAttributes:
-                labels.append(tkinter.Label(subframe, text = device.upper()))
+            for key in tio._routes:
+                device = tio._routes[key]
+                labels.append(tkinter.Label(subframe, text = device.dev.name()))
                 labels[i].grid(column = i, row = 1)
                 i+=1
-                if "vmr" in device.lower():
-                    for j in range(len(vmrStreamList)):
-                        stre = device.lower()+"." + vmrStreamList[j]
+                if 'sync' not in device.dev.name().lower():
+                    for j in range(len(deviceAttributes[device])):
+                        if key == '/':
+                            stre = device.dev.name().lower()+"." + deviceAttributes[device][j]
+                        else:
+                            stre = device.dev.name().lower()+key+"." + deviceAttributes[device][j]
                         streamb.append(tkinter.Label(subframe,text = stre))
                         streamb[n].grid(column = i-1, row = j+2)
                         n +=1
@@ -198,7 +195,7 @@ class StartPage(tkinter.Frame):
         quitbutton.pack()
 
 class GraphPage(tkinter.Frame):
-    def __init__(self, tio, plotter, vmrStreamList, defaultStream, windowLength, parent, controller):
+    def __init__(self, tio, plotter, defaultStream, windowLength, parent, controller):
         tkinter.Frame.__init__(self,parent)
         
 
@@ -257,16 +254,13 @@ def main():
     # get DeviceSync
     tio = processCommandLineArgs()
     
-    # get possible streams for each device, right now hardcoded for vmr
-    vmrStreamList = getStreams()
-    
     # get defaults for the graph 
-    defaultStream, start_stream , start_length= setDefaults(tio, vmrStreamList)
+    defaultStream, start_stream , start_length= setDefaults(tio)
     
     # create plot instance
     plotter = createPlot(start_stream, start_length)
     
-    app = graphInterface(tio, plotter, vmrStreamList, defaultStream, start_length)
+    app = graphInterface(tio, plotter, defaultStream, start_length)
     app.geometry("1280x720")
     ani = matplotlib.animation.FuncAnimation(plotter.fig, plotter.animate, interval=100)#dev.data.rate())
     app.mainloop()
