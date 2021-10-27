@@ -160,11 +160,11 @@ class StartPage(tkinter.Frame):
             def callback():
                 newSList = []
                 strlst = (e.get())
-                strlst = strlst.split(",")
+                strlst = strlst.split(", ")
                 devList = []
                 for strstream in strlst:
                     strstream = strstream.split(".")
-                    print("Streams",strstream)
+                    strstream[0].replace(" ","_")
                     try:
                         devList.append(strstream[0])
                         dev = getattr(tio, strstream[0])
