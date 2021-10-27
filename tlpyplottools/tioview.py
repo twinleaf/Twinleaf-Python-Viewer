@@ -160,7 +160,7 @@ class StartPage(tkinter.Frame):
             def callback():
                 newSList = []
                 strlst = (e.get())
-                strlst = strlst.split(", ")
+                strlst = strlst.split(",")
                 devList = []
                 for strstream in strlst:
                     strstream = strstream.split(".")
