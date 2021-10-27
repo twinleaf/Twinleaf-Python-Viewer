@@ -165,6 +165,7 @@ class StartPage(tkinter.Frame):
                 for strstream in strlst:
                     strstream = strstream.split(".")
                     strstream[0].replace(" ","_")
+                    print(strstream)
                     try:
                         devList.append(strstream[0])
                         dev = getattr(tio, strstream[0])
