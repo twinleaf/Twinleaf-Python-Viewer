@@ -7,7 +7,6 @@ Author: Esme Rubinstein <rubinstein@twinleaf.com>, Tom Kornack <kornack@twinleaf
 
 import matplotlib
 import time
-import re
 import argparse
 import tkinter
 import tlpyplot
@@ -161,7 +160,7 @@ class StartPage(tkinter.Frame):
             def callback():
                 newSList = []
                 strlst = (e.get())
-                strlst = re.split(r'[-,\s]\s*',strlst)
+                strlst = strlst.split(",")
                 devList = []
                 for strstream in strlst:
                     strstream = strstream.split(".")
@@ -171,7 +170,7 @@ class StartPage(tkinter.Frame):
                         fullstream = getattr(dev, strstream[1])
                         newSList.append(fullstream)
                     except AttributeError:
-                        popupmsg("Not a valid stream.  Entered stream values should look like: 'vmr0.vector, vmr1.bar', where different streams are separated by a comma.")
+                        popupmsg("Not a valid stream.  Entered stream values should look like: 'vmr0.vector,vmr1.bar', where different streams are separated by a comma.  Do not put any spaces.")
                         break
 
                 if len(devList) == len(set(devList)):
