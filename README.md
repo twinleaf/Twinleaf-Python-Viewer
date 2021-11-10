@@ -39,8 +39,8 @@ Then, run the program as follows, depending on your platform:
     % tioview udp://tio-sync8.local # macOS, linux
     % tioview tcp://10.0.0.x # macOS, Linux, connection to proxy
 
-Visit our [Getting Started](https://twinleaf.com/start/) page for more details on getting started with Twinleaf sensors.
-
 This installation also includes a Python graphical user interface specifically designed for a single VMR sensor.  Run this program with 
 
     % vm_monitor
+  
+Visit our [Getting Started](https://twinleaf.com/start/) page for more details on getting started with Twinleaf sensors.
