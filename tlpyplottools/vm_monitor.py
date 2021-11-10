@@ -15,9 +15,31 @@ import tlpyplot
 matplotlib.use("TkAgg")
 matplotlib.style.use("ggplot")
 
+def changeQSize(widget, plotter, tio):
+    seconds = widget.get()
+    rate = plotter.ss.rate()
+    windowLength = int(float(seconds)*float(rate))
+    plotter.changeQueueSize(windowLength)
 
-def color_change(widget, color):
-    widget.config(foreground = color)
+def rateChange(widget, plotter, tio):
+    rate = widget.get()
+    rate = float(rate)
+    tio._routes['/'].data.rate(rate)
+    plotter.fig.clf()
+    plotter.reinitialize(plotter.queueLength, plotter.streamList)
+    plotter.allax[0].set_ylabel("Field X (nT)")
+    plotter.allax[1].set_ylabel("Field Y (nT)")
+    plotter.allax[2].set_ylabel("Field Z (nT)")
+
+def upDownEntry(widget, direction, plotter, tio, func):
+    current = float(widget.get())
+    if direction == "up":
+        new = current + 1
+    elif direction == "down":
+        new = current - 1
+    widget.delete(0,'end')
+    widget.insert(0,new)
+    func(widget, plotter, tio)
 
 def processCommandLineArgs():
     parser = argparse.ArgumentParser(prog='vectorMonitor', 
@@ -31,7 +53,6 @@ def processCommandLineArgs():
     time.sleep(1)
     return tio
 
-# popup message general function
 def popupmsg(msg):
     popup = tkinter.Tk()
     popup.wm_title("!")
@@ -92,8 +113,6 @@ class GraphPage(tkinter.Frame):
         def graphSettings():
             subframe = tkinter.Frame(self)
             subsubframe = tkinter.Frame(subframe)
-            # label = tkinter.Label(subsubframe, text = "TIO Monitor")
-            # label.grid(column = 0, row = 0, padx = 30)
 
             label2 = tkinter.Label(subsubframe, text = "Window Duration (s)")
             label2.grid(column = 1, row = 0)
@@ -102,17 +121,9 @@ class GraphPage(tkinter.Frame):
             e.insert(0, int(windowLength)/int(plotter.ss.rate()))
             e.grid(column = 2, row = 0)
             e.focus_set()
-
-            def callback(var):
-                seconds = e.get()
-                rate = plotter.ss.rate()
-                windowLength = int(float(seconds)*float(rate))
-                plotter.changeQueueSize(windowLength)
-                #print("set window length to", windowLength)
-
-            e.bind('<Return>', callback)
-            e.bind('<Enter>', lambda event: color_change(e, "dark green"))
-            e.bind('<Leave>', lambda event: color_change(e, "black"))
+            e.bind('<Return>', lambda event: changeQSize(e, plotter, tio))
+            e.bind('<Up>', lambda event: upDownEntry(e, "up", plotter, tio, changeQSize))
+            e.bind('<Down>', lambda event: upDownEntry(e, "down", plotter, tio, changeQSize))
 
             ratelabel = tkinter.Label(subsubframe, text = "Data Rate (Hz):")
             ratelabel.grid(column = 4, row = 0)
@@ -121,20 +132,10 @@ class GraphPage(tkinter.Frame):
             e2.insert(0, plotter.ss.rate())
             e2.grid(column = 5, row = 0)
             e2.focus_set()
-
-            def rateCallback(var):
-                rate = e2.get()
-                rate = float(rate)
-                tio._routes['/'].data.rate(rate)
-                plotter.fig.clf()
-                plotter.reinitialize(plotter.queueLength, plotter.streamList)
-                plotter.allax[0].set_ylabel("Field X (nT)")
-                plotter.allax[1].set_ylabel("Field Y (nT)")
-                plotter.allax[2].set_ylabel("Field Z (nT)")
                 
-            e2.bind('<Return>', rateCallback)
-            e2.bind('<Enter>', lambda event: color_change(e2, "dark green"))
-            e2.bind('<Leave>', lambda event: color_change(e2, "black"))
+            e2.bind('<Return>', lambda event: rateChange(e2, plotter, tio))
+            e2.bind('<Up>', lambda event: upDownEntry(e2, "up",plotter, tio,rateChange))
+            e2.bind('<Down>', lambda event: upDownEntry(e2, "down",plotter, tio, rateChange))
 
             subsubframe2 = tkinter.Frame(subframe)
 
@@ -167,7 +168,7 @@ class GraphPage(tkinter.Frame):
             newframe.pack(side = 'bottom')#, pady=5)
             updater()
         
-        streamedValues()
+        #streamedValues()
 
         plotter.allax[0].set_ylabel("Field X (nT)")
         plotter.allax[1].set_ylabel("Field Y (nT)")
