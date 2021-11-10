@@ -41,6 +41,6 @@ Then, run the program as follows, depending on your platform:
 
 Visit our [Getting Started](https://twinleaf.com/start/) page for more details on getting started with Twinleaf sensors.
 
-## Known Issues
+This installation also includes a Python graphical user interface specifically designed for a single VMR sensor.  Run this program with 
 
-- There are momentary pauses in the graph animation in some configurations.
+    % vm_monitor
