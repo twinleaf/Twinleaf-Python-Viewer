@@ -164,13 +164,15 @@ class StartPage(tkinter.Frame):
                 devList = []
                 for strstream in strlst:
                     strstream = strstream.split(".")
+                    strstream[0].replace(" ","_")
+                    print(strstream)
                     try:
                         devList.append(strstream[0])
                         dev = getattr(tio, strstream[0])
                         fullstream = getattr(dev, strstream[1])
                         newSList.append(fullstream)
                     except AttributeError:
-                        popupmsg("Not a valid stream.  Entered stream values should look like: 'vmr0.vector, vmr1.bar', where different streams are separated by a comma and a space.")
+                        popupmsg("Not a valid stream.  Entered stream values should look like: 'vmr0.vector, vmr1.bar', where different streams are separated by a comma.")
                         break
 
                 if len(devList) == len(set(devList)):
