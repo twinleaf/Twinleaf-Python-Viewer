@@ -167,7 +167,7 @@ class GraphPage(tkinter.Frame):
             newframe.pack(side = 'bottom')#, pady=5)
             updater()
         
-        #streamedValues()
+        streamedValues()
 
         plotter.allax[0].set_ylabel("Field X (nT)")
         plotter.allax[1].set_ylabel("Field Y (nT)")
