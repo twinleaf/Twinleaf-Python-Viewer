@@ -23,7 +23,7 @@ class TLPyPlot:
 
         matplotlib.rcParams['font.family'] = 'Palatino'
         self.fig = matplotlib.pyplot.figure()#constrained_layout=True)
-        self.fig.subplots_adjust(left=0.08, right=0.97, top=0.97, bottom=0.08)
+        self.fig.subplots_adjust(left=0.08, right=0.97, top=0.96, bottom=0.12)
 
         self.reinitialize(self.queueLength, self.streamList)
         self.animate()
@@ -75,5 +75,4 @@ class TLPyPlot:
                     self.allax[i-1].set_xlim(self.data_t[0], self.data_t[-1])
                     self.allax[i-1].relim()
                     self.allax[i-1].autoscale_view()
-        return self.allaxline
 
