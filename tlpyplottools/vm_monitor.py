@@ -10,6 +10,7 @@ import time
 import argparse
 import tkinter
 import tlpyplot
+import numpy as np
 
 # styles and fonts
 matplotlib.use("TkAgg")
@@ -62,6 +63,14 @@ def popupmsg(msg):
     B1.pack()
     popup.mainloop()
 
+def saveData(plotter):
+    f = tkinter.filedialog.asksaveasfile(mode = 'w', defaultextension = ".csv")
+    if f is None:
+        return
+    a = np.asarray(plotter.alldata)
+    np.savetxt(f, a.T, delimiter=",")
+    f.close()
+    
 def setDefaults(tio):
     start_length = 500
     start_stream = [tio.vmr.vector]
@@ -140,7 +149,10 @@ class GraphPage(tkinter.Frame):
             subsubframe2 = tkinter.Frame(subframe)
 
             quitbutton = tkinter.Button(subsubframe2, text = "Quit", command = quit)
-            quitbutton.grid(column = 3, row = 0, padx = 20)
+            quitbutton.grid(column = 4, row = 0, padx = 20)
+
+            savebutton = tkinter.Button(subsubframe2, text = "Save", command = lambda: saveData(plotter))
+            savebutton.grid(column = 3, row = 0)
 
             subsubframe.grid(row = 0, column = 0)
             subsubframe2.grid(row = 0, column = 1)
