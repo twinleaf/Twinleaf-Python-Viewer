@@ -62,10 +62,11 @@ def setDefaults(tio):
     for key in tio._routes:
         device = tio._routes[key]
         if "sync" not in device.dev.name().lower():
+            name = device.dev.name().lower().replace(" ", "_")
             if key == '/':
-                defaultStream = device.dev.name().lower() + "." + connectedDevices[device][0]
+                defaultStream = name + "." + connectedDevices[device][0]
             else:
-                defaultStream = device.dev.name().lower() + key + "." + connectedDevices[device][0]
+                defaultStream = name + key + "." + connectedDevices[device][0]
             stre = getattr(device, connectedDevices[device][0])
             start_stream = [stre]
             break 
@@ -139,10 +140,11 @@ class StartPage(tkinter.Frame):
                 i+=1
                 if 'sync' not in device.dev.name().lower():
                     for j in range(len(deviceAttributes[device])):
+                        name = device.dev.name().lower().replace(" ", "_")
                         if key == '/':
-                            stre = device.dev.name().lower()+"." + deviceAttributes[device][j]
+                            stre = name+"." + deviceAttributes[device][j]
                         else:
-                            stre = device.dev.name().lower()+key+"." + deviceAttributes[device][j]
+                            stre = name+key+"." + deviceAttributes[device][j]
                         streamb.append(tkinter.Label(subframe,text = stre))
                         streamb[n].grid(column = i-1, row = j+2)
                         n +=1
