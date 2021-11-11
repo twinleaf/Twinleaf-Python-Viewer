@@ -64,7 +64,7 @@ class TLPyPlot:
     def animate(self,*args):
         dataLoad = self.ss.readAvailable()
         for i in range(len(dataLoad)):
-            if type(dataLoad[i]) is float:
+            if type(dataLoad[i]) is not list:
                 dataLoad[i] = [dataLoad[i]]#[self.ss.read(samples = 1)[i]]
             if not self.pause:
                 if i == 0:

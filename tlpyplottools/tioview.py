@@ -259,7 +259,6 @@ def main():
     
     # get defaults for the graph 
     defaultStream, start_stream , start_length= setDefaults(tio)
-    
     # create plot instance
     plotter = createPlot(start_stream, start_length)
     
