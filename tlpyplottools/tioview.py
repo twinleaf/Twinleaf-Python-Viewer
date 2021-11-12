@@ -47,12 +47,28 @@ def popupmsg(msg):
     B1.pack()
     popup.mainloop()
 
-# pause function
-# def loadChart():
-#     if rtp.pause == True:
-#         rtp.pause = False
-#     else:
-#         rtp.pause = True
+def changeQSize(widget, plotter, tio):
+    seconds = widget.get()
+    rate = plotter.ss.rate()
+    windowLength = int(float(seconds)*float(rate))
+    plotter.changeQueueSize(windowLength)
+
+def rateChange(widget, plotter, tio):
+    rate = widget.get()
+    rate = float(rate)
+    plotter.ss.rate(rate)
+    plotter.fig.clf()
+    plotter.reinitialize(plotter.queueLength, plotter.streamList)
+
+def upDownEntry(widget, direction, plotter, tio, func):
+    current = float(widget.get())
+    if direction == "up":
+        new = current + 1
+    elif direction == "down":
+        new = current - 1
+    widget.delete(0,'end')
+    widget.insert(0,new)
+    func(widget, plotter, tio)
 
 # set initial stream list by looking at connected devices
 def setDefaults(tio):
@@ -75,6 +91,32 @@ def setDefaults(tio):
 def createPlot(streamList, windowLength):
     plotter = tlpyplot.TLPyPlot(queueLength = windowLength, streamList = streamList)
     return plotter
+
+def enterStream(widget, tio, plotter):
+    newSList = []
+    strlst = (widget.get())
+    strlst = strlst.split(", ")
+    devList = []
+    for strstream in strlst:
+        strstream = strstream.split(".")
+        strstream[0].replace(" ","_")
+        print(strstream)
+        try:
+            devList.append(strstream[0])
+            dev = getattr(tio, strstream[0])
+            fullstream = getattr(dev, strstream[1])
+            newSList.append(fullstream)
+        except AttributeError:
+            popupmsg("Not a valid stream.  Entered stream values should look like: 'vmr0.vector, vmr1.bar', where different streams are separated by a comma.")
+            break
+
+    if len(devList) == len(set(devList)):
+        plotter.fig.clf()
+        plotter.reinitialize(500, newSList)
+        popupmsg("Stream successfully loaded, click 'Go!' to see plot")
+
+    else:
+        popupmsg("Only one stream from each device can be added.")  
 
 
 class graphInterface(tkinter.Tk):
@@ -159,33 +201,8 @@ class StartPage(tkinter.Frame):
             e.pack(side = 'left')
             e.focus_set()
 
-            def callback():
-                newSList = []
-                strlst = (e.get())
-                strlst = strlst.split(", ")
-                devList = []
-                for strstream in strlst:
-                    strstream = strstream.split(".")
-                    strstream[0].replace(" ","_")
-                    print(strstream)
-                    try:
-                        devList.append(strstream[0])
-                        dev = getattr(tio, strstream[0])
-                        fullstream = getattr(dev, strstream[1])
-                        newSList.append(fullstream)
-                    except AttributeError:
-                        popupmsg("Not a valid stream.  Entered stream values should look like: 'vmr0.vector, vmr1.bar', where different streams are separated by a comma.")
-                        break
-
-                if len(devList) == len(set(devList)):
-                    plotter.fig.clf()
-                    plotter.reinitialize(500, newSList)
-                    popupmsg("Stream successfully loaded, click 'Go!' to see plot")
-        
-                else:
-                    popupmsg("Only one stream from each device can be added.")  
-
-            b = tkinter.Button(subframe2, text = "Load Streams", width = 10, command = callback)
+            e.bind('<Return>', lambda event: enterStream(e, tio, plotter))
+            b = tkinter.Button(subframe2, text = "Load Streams", width = 10, command = lambda: enterStream(e, tio, plotter))
             b.pack(side = 'left')
             subframe2.pack()
 
@@ -212,19 +229,13 @@ class GraphPage(tkinter.Frame):
             label2.grid(column = 1, row = 0)
 
             e = tkinter.Entry(subsubframe)
-            e.insert(0, windowLength)
+            e.insert(0, int(windowLength)/int(plotter.ss.rate()))
             e.grid(column = 2, row = 0)
             e.focus_set()
 
-            def callback():
-                seconds = e.get()
-                rate = plotter.ss.rate()
-                windowLength = int(seconds)*int(rate)
-                plotter.changeQueueSize(windowLength)
-                #print("set window length to", windowLength)
-
-            b = tkinter.Button(subsubframe, text = "Submit", width = 5, command = callback)
-            b.grid(column = 3, row = 0, padx = 20)
+            e.bind('<Return>', lambda event: changeQSize(e, plotter, tio))
+            e.bind('<Up>', lambda event: upDownEntry(e, "up", plotter, tio, changeQSize))
+            e.bind('<Down>', lambda event: upDownEntry(e, "down", plotter, tio, changeQSize))
 
             subsubframe2 = tkinter.Frame(subframe)
 
