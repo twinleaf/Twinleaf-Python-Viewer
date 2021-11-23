@@ -118,6 +118,37 @@ def enterStream(widget, tio, plotter):
     else:
         popupmsg("Only one stream from each device can be added.")  
 
+def addChecked(varLst, plotter, tio):
+    strlst = []
+    newSList = []
+    devList = []
+    for i in range(len(varLst)):
+        for var in varLst[i]:
+            print("var", var.get())
+            if var.get() != "NULL":
+                strlst.append(var.get())
+    for strstream in strlst:
+        strstream = strstream.split(".")
+        strstream[0].replace(" ","_")
+        print(strstream)
+        try:
+            devList.append(strstream[0])
+            dev = getattr(tio, strstream[0])
+            fullstream = getattr(dev, strstream[1])
+            newSList.append(fullstream)
+        except AttributeError:
+            popupmsg("Not a valid stream.  Entered stream values should look like: 'vmr0.vector, vmr1.bar', where different streams are separated by a comma.")
+            break
+
+    if len(devList) == len(set(devList)):
+        print("newstream", newSList)
+        plotter.fig.clf()
+        plotter.reinitialize(500, newSList)
+        popupmsg("Stream successfully loaded, click 'Go!' to see plot")
+
+    else:
+        popupmsg("Only one stream from each device can be added.")  
+    
 
 class graphInterface(tkinter.Tk):
     def __init__(self, tio, plotter, defaultStream, windowLength, *args, **kwargs):
@@ -174,25 +205,37 @@ class StartPage(tkinter.Frame):
             streamb = []
             deviceAttributes = getStreams(tio)
             i = 0
-            n = 0           
+            n = 0     
+            vars = []   
+            def setVar(var, value):
+                var.set(value)
             for key in tio._routes:
                 device = tio._routes[key]
                 labels.append(tkinter.Label(subframe, text = device.dev.name()))
                 labels[i].grid(column = i, row = 1)
                 i+=1
-                if 'sync' not in device.dev.name().lower():
-                    for j in range(len(deviceAttributes[device])):
-                        name = device.dev.name().lower().replace(" ", "_")
-                        if key == '/':
-                            stre = name+"." + deviceAttributes[device][j]
-                        else:
-                            stre = name+key+"." + deviceAttributes[device][j]
-                        streamb.append(tkinter.Label(subframe,text = stre))
-                        streamb[n].grid(column = i-1, row = j+2)
-                        n +=1
+                #if 'sync' not in device.dev.name().lower():
+                devVars = []
+                for j in range(len(deviceAttributes[device])):
+                    devVars.append(tkinter.StringVar())
+                    name = device.dev.name().lower().replace(" ", "_")
+                    if key == '/':
+                        stre = name+"." + deviceAttributes[device][j]
+                    else:
+                        stre = name+key+"." + deviceAttributes[device][j]
+                    check = tkinter.Label(subframe, text = stre)#Checkbutton(subframe,text = stre, variable = devVars[j], onvalue = stre, offvalue = "NULL", command = lambda: setVar(devVars[j], check.cget("text")))
+                    streamb.append(check)
+                    devVars[j].set("NULL")
+                    streamb[n].grid(column = i-1, row = j+2)
+                    n +=1
+                vars.append(devVars)
             subframe.pack(pady = 20)
+            for i in range(len(vars)):
+                for var in vars[i]:
+                    print("vars", var.get())
+            return vars
 
-        streamChart(tio)
+        vars = streamChart(tio)
 
         def getStreamEntry():
             subframe2 = tkinter.Frame(self)
@@ -218,7 +261,6 @@ class GraphPage(tkinter.Frame):
     def __init__(self, tio, plotter, defaultStream, windowLength, parent, controller):
         tkinter.Frame.__init__(self,parent)
         
-
         def graphSettings():
             subframe = tkinter.Frame(self)
             subsubframe = tkinter.Frame(subframe)
