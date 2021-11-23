@@ -100,7 +100,6 @@ def enterStream(widget, tio, plotter):
     for strstream in strlst:
         strstream = strstream.split(".")
         strstream[0].replace(" ","_")
-        print(strstream)
         try:
             devList.append(strstream[0])
             dev = getattr(tio, strstream[0])
@@ -230,9 +229,9 @@ class StartPage(tkinter.Frame):
                     n +=1
                 vars.append(devVars)
             subframe.pack(pady = 20)
-            for i in range(len(vars)):
-                for var in vars[i]:
-                    print("vars", var.get())
+            # for i in range(len(vars)):
+            #     for var in vars[i]:
+            #         print("vars", var.get())
             return vars
 
         vars = streamChart(tio)
