@@ -97,10 +97,13 @@ def enterStream(widget, tio, plotter):
     strlst = (widget.get())
     strlst = strlst.split(", ")
     devList = []
+    syncPresent = False
     for strstream in strlst:
         strstream = strstream.split(".")
         strstream[0].replace(" ","_")
         try:
+            if "sync" in strstream[0]:
+                syncPresent = True
             devList.append(strstream[0])
             dev = getattr(tio, strstream[0])
             fullstream = getattr(dev, strstream[1])
@@ -109,13 +112,14 @@ def enterStream(widget, tio, plotter):
             popupmsg("Not a valid stream.  Entered stream values should look like: 'vmr0.vector, vmr1.bar', where different streams are separated by a comma.")
             break
 
-    if len(devList) == len(set(devList)):
+    if (len(devList) != len(set(devList)) or ((syncPresent == True) and (len(devList)>1))):
+        popupmsg("Only one stream from each device can be added. Sync streams cannot be added with other streams.")
+
+    else:
         plotter.fig.clf()
         plotter.reinitialize(500, newSList)
         popupmsg("Stream successfully loaded, click 'Go!' to see plot")
-
-    else:
-        popupmsg("Only one stream from each device can be added.")  
+          
 
 def addChecked(varLst, plotter, tio):
     strlst = []
