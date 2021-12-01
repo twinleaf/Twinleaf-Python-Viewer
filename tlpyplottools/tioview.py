@@ -22,10 +22,15 @@ def processCommandLineArgs():
                 nargs='?', 
                 default='tcp://localhost/',
                 help='URL: tcp://localhost')
+    parser.add_argument("--noSync",action='store_true')
     args = parser.parse_args()
+    if args.noSync:
+        wallSync = True
+    else:
+        wallSync = False
     tio = tlpyplot.tldevicesync.DeviceSync(args.url)
     time.sleep(1)
-    return tio
+    return tio, wallSync
 
 def getStreams(tio):
     deviceDict = {}
@@ -49,14 +54,15 @@ def popupmsg(msg):
 
 def changeQSize(widget, plotter, tio):
     seconds = widget.get()
-    rate = plotter.ss.rate()
-    windowLength = int(float(seconds)*float(rate))
-    plotter.changeQueueSize(windowLength)
+    #print(seconds)
+    #rate = plotter.ss[0].rate()
+    #windowLength = int(float(seconds)*float(rate))
+    plotter.changeQueueSize(seconds)
 
 def rateChange(widget, plotter, tio):
     rate = widget.get()
     rate = float(rate)
-    plotter.ss.rate(rate)
+    plotter.ss[0].rate(rate)
     plotter.fig.clf()
     plotter.reinitialize(plotter.queueLength, plotter.streamList)
 
@@ -88,8 +94,8 @@ def setDefaults(tio):
             break 
     return defaultStream, start_stream, start_length
 
-def createPlot(streamList, windowLength):
-    plotter = tlpyplot.TLPyPlot(queueLength = windowLength, streamList = streamList)
+def createPlot(streamList, windowLength, wallSync):
+    plotter = tlpyplot.TLPyPlot(queueLength = windowLength, streamList = streamList, wallSync = wallSync)
     return plotter
 
 def enterStream(widget, tio, plotter):
@@ -117,6 +123,7 @@ def enterStream(widget, tio, plotter):
 
     else:
         plotter.fig.clf()
+        print(newSList)
         plotter.reinitialize(500, newSList)
         popupmsg("Stream successfully loaded, click 'Go!' to see plot")
           
@@ -274,7 +281,7 @@ class GraphPage(tkinter.Frame):
             label2.grid(column = 1, row = 0)
 
             e = tkinter.Entry(subsubframe)
-            e.insert(0, int(windowLength)/int(plotter.ss.rate()))
+            #e.insert(0, int(windowLength)/int(plotter.ss.rate()))
             e.grid(column = 2, row = 0)
             e.focus_set()
 
@@ -311,12 +318,12 @@ class GraphPage(tkinter.Frame):
 
 def main():
     # get DeviceSync
-    tio = processCommandLineArgs()
+    tio, wallSync = processCommandLineArgs()
     
     # get defaults for the graph 
     defaultStream, start_stream , start_length= setDefaults(tio)
     # create plot instance
-    plotter = createPlot(start_stream, start_length)
+    plotter = createPlot(start_stream, start_length, wallSync)
     
     app = graphInterface(tio, plotter, defaultStream, start_length)
     app.geometry("1280x720")
